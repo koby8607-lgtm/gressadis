@@ -1,4 +1,4 @@
-# USB0 Manager v2.1.0
+# USB0 Manager v2.1.3
 
 R36S / Android 11 USB0 and RNDIS recovery toolkit.
 
@@ -72,6 +72,13 @@ Implemented features include SIM-aware named profiles, automatic profile selecti
 PPP Widget 3 also supports NCM, ECM and QMI in addition to PPP and provides full network awareness through platform-specific mechanisms. This project reports those kernel transports and uses the existing RNDIS/USB-network recovery path for Ethernet-style transports; the classic serial PPP path is handled by bundled `pppd`/`chat`. A generic app cannot reproduce PPP Widget 3's private native USB/network-awareness implementation byte-for-byte.
 
 
-## v2.1.0 build hardening
+## v2.1.3 build hardening
 
 The ARM64 PPP build uses the supplied Linux/Android NDK toolchain and patches PPP 2.5.4 only at the Android header-compatibility point where the legacy `struct in6_ifreq` fallback conflicts with Android NDK r27c's `linux/ipv6.h`. IPv6CP remains enabled. The CI build uses a validated NDK archive instead of `sdkmanager` for NDK installation and performs a serial verbose PPP build so a future compiler failure exposes the real diagnostic. The supplied ARM64 BusyBox remains prebuilt and is never compiled or executed on the x86_64 runner.
+
+
+Build fix carried forward from 2.1.1: PPP outputs are copied using an absolute repository path after the PPP source directory is entered, preventing the CI `cp: cannot create regular file ... No such file or directory` failure. The script also removes stale pppd/chat outputs before rebuilding.
+
+## v2.1.3 Kotlin build fix
+
+The PPP Widget compatibility receiver now avoids escaped double-quotes inside Kotlin string-template expressions. The runtime PPP command is assembled from ordinary Kotlin expressions and a dedicated shell-quoting helper, eliminating the `PppControlReceiver.kt:25 Expecting an expression` failure seen in CI.
