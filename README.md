@@ -1,4 +1,4 @@
-# USB0 Manager v2.0.0
+# USB0 Manager v2.1.0
 
 R36S / Android 11 USB0 and RNDIS recovery toolkit.
 
@@ -72,14 +72,6 @@ Implemented features include SIM-aware named profiles, automatic profile selecti
 PPP Widget 3 also supports NCM, ECM and QMI in addition to PPP and provides full network awareness through platform-specific mechanisms. This project reports those kernel transports and uses the existing RNDIS/USB-network recovery path for Ethernet-style transports; the classic serial PPP path is handled by bundled `pppd`/`chat`. A generic app cannot reproduce PPP Widget 3's private native USB/network-awareness implementation byte-for-byte.
 
 
-## v2.0 aggressive recovery changes
+## v2.1.0 build hardening
 
-- Root-first recovery with a full backup before invasive operations.
-- Native Android `ip` is preferred; the supplied ARM64 BusyBox is used for missing legacy utilities such as `arp` and DHCP helpers.
-- Host/gadget RNDIS roles are detected separately. Existing `usb0` host links are not blindly converted into gadget mode.
-- ConfigFS RNDIS fallback can manage `dev_addr` and `host_addr` when the R36S itself is acting as a USB gadget.
-- USB power/autosuspend recovery, USB re-authorisation, driver fallback/rebind, neighbour/ARP repair, DHCP, policy routing, route repair, DNS/netd repair and staged connectivity tests are retained.
-- A dedicated RNDIS peer-discovery diagnostic reports kernel/RNDIS attributes and learned neighbours without inventing a MAC address.
-- PPP 2.5.4 is built for Android API 30/ARM64 with Android/Bionic compatibility defines and serial verbose diagnostics. If the optional PPP build fails, CI still produces the core USB0/RNDIS APK and uploads the full PPP compiler log.
-- The supplied ARM64 BusyBox is used directly; CI never builds or executes it.
-- PPP binaries are optional in the APK build so a PPP compiler failure does not destroy the core USB0 recovery build.
+The ARM64 PPP build uses the supplied Linux/Android NDK toolchain and patches PPP 2.5.4 only at the Android header-compatibility point where the legacy `struct in6_ifreq` fallback conflicts with Android NDK r27c's `linux/ipv6.h`. IPv6CP remains enabled. The CI build uses a validated NDK archive instead of `sdkmanager` for NDK installation and performs a serial verbose PPP build so a future compiler failure exposes the real diagnostic. The supplied ARM64 BusyBox remains prebuilt and is never compiled or executed on the x86_64 runner.
